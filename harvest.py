@@ -3,7 +3,6 @@ import requests
 from datetime import datetime
 
 # Set constants
-fname = str(datetime.now().strftime('%Y%m%d%H%M')) + ".tsv" # Filename is current time and date
 baseURL = "https://api.semanticscholar.org/v1/paper/"
 unKnown = "?include_unknown_references=true" # Includes unknown references
 
@@ -16,11 +15,16 @@ response = requests.get(url)
 record = json.loads(response.text)
 
 # Identify Citations
-citations = record["citations"]
+
+try:
+    citations = record["citations"]
+except:
+    print("Error, check Scholar ID")
+    exit()
 
 # Write Citations to file
+fname = str(id + "_" + datetime.now().strftime('%Y%m%d%H%M')) + ".tsv" # Filename is current time and date
 f = open(fname, "a", encoding="utf-8")
-f.write("Data for Semantic Scholar ID " + id + " produced on " + str(datetime.now().strftime('%Y%m%d%H%M')) + "\n")
 f.write("doi\ttitle\tauthors\tyear\tpaperId\tintent\tisInfluential\turl\tvenue\tarxivId\n")
 
 for cite in citations:
