@@ -19,7 +19,7 @@ print("Trying: " + url)
 response = requests.get(url)
 record = json.loads(response.text)
 print("Success")
-# Identify Citations - BETTER ERROR HANDLING REQUIRED
+# Identify Citations
 try:
     citations = record["citations"]
 except:
