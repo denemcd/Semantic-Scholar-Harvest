@@ -18,15 +18,16 @@ url = baseURL + id + unKnown
 print("Trying: " + url)
 response = requests.get(url)
 record = json.loads(response.text)
-print("Success")
 # Identify Citations
 try:
     citations = record["citations"]
+    print("Success")
 except:
-    print("Error, check Scholar ID")
+    print("Error:", record["error"])
     exit()
 
 # Write Citations to file
+count = 0
 fname = str(id + "_" + datetime.now().strftime('%Y%m%d%H%M')) + ".tsv" # Filename is current time and date
 f = open(fname, "a", encoding = "UTF-8")
 f.write("doi\ttitle\tauthors\tyear\tpaperId\tintent\tisInfluential\turl\tvenue\tarxivId\n")
@@ -41,7 +42,8 @@ for tags in citations:
     #Write all tags to the file
     text = str(tags["doi"]) + "\t" + str(tags["title"]) + "\t" + authorslist + "\t" + str(tags["year"]) + "\t" + str(tags["paperId"]) + "\t" + str(tags["intent"]) + "\t" + str(tags["isInfluential"]) + "\t" + str(tags["url"]) + "\t" + str(tags["venue"]) + "\t" + str(tags["arxivId"]) + "\n"
     f.write(text)
+    count+=1
 
 f.close() # close file
-
+print(str(count), " citation written to file")
 exit()
