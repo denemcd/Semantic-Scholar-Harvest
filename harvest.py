@@ -2,22 +2,24 @@ import json
 import requests
 from datetime import datetime
 
-# Set constants
+# Set constants and default values
 baseURL = "https://api.semanticscholar.org/v1/paper/"
 unKnown = "?include_unknown_references=true" # Includes unknown references
+count = 0
 
-# Build URL
+# Get Semantic Scholar ID
 id = input("Semantic Scholar ID: ") # Get ID from user
 if id == "":
-    id = "d4b651d6a904f69f8fa1dcad4ebe972296af3a9a"
-    print("No ID entered. Using test ID d4b651d6a904f69f8fa1dcad4ebe972296af3a9a")
+    id = "f2c85749099eeefbd0b36d9fb8868dfa827628b4" # If the user doen't enter an ID use default (makes testing easier)
+    print("No ID entered. Using test ID f2c85749099eeefbd0b36d9fb8868dfa827628b4")
 
-url = baseURL + id + unKnown
+url = baseURL + id + unKnown # Build URL
 
-# Get Record and convert to JSON
+# Query API and convert to JSON
 print("Trying: " + url)
 response = requests.get(url)
 record = json.loads(response.text)
+
 # Identify Citations
 try:
     citations = record["citations"]
@@ -27,23 +29,29 @@ except:
     exit()
 
 # Write Citations to file
-count = 0
-fname = str(id + "_" + datetime.now().strftime('%Y%m%d%H%M')) + ".tsv" # Filename is current time and date
-f = open(fname, "a", encoding = "UTF-8")
-f.write("doi\ttitle\tauthors\tyear\tpaperId\tintent\tisInfluential\turl\tvenue\tarxivId\n")
+fname = str(id + "_" + datetime.now().strftime('%Y%m%d%H%M')) + ".csv" # Filename is current time and date
 
-for tags in citations:
-    #Identfy author names and clean them
-    authorslist = ""
-    authors = tags["authors"]
-    for author in authors:
-        authorslist = authorslist + author["name"] + ";"
+with open(fname, "w", encoding="UTF-8") as f:
+    f.write("doi\ttitle\tauthors\tyear\tpaperId\tintent\tisInfluential\turl\tvenue\tarxivId")
 
-    #Write all tags to the file
-    text = str(tags["doi"]) + "\t" + str(tags["title"]) + "\t" + authorslist + "\t" + str(tags["year"]) + "\t" + str(tags["paperId"]) + "\t" + str(tags["intent"]) + "\t" + str(tags["isInfluential"]) + "\t" + str(tags["url"]) + "\t" + str(tags["venue"]) + "\t" + str(tags["arxivId"]) + "\n"
-    f.write(text)
-    count+=1
+    for tags in citations:
+        
+        #Identfy author names and clean them
+        authorslist = ""
+        authors = tags["authors"]
+        for author in authors:
+            authorslist = authorslist + author["name"] + ";"
+        
+        #Identfy intent field and clean
+        intentlist = ""
+        intent = tags["intent"]
+        for intentField in intent:
+            intentlist = intentlist + intentField + ";"
 
-f.close() # close file
-print(str(count), " citation written to file")
+        #Write all tags to the TSV file
+        text = "\n" + str(tags["doi"]) + "\t" + str(tags["title"]) + "\t" + authorslist + "\t" + str(tags["year"]) + "\t" + str(tags["paperId"]) + "\t" + str(intentlist) + "\t" + str(tags["isInfluential"]) + "\t" + str(tags["url"]) + "\t" + str(tags["venue"]) + "\t" + str(tags["arxivId"])
+        f.write(text)
+        count+=1
+
+print(str(count), " citation(s) written to file")
 exit()
