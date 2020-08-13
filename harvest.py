@@ -52,7 +52,7 @@ for tags in citations:
     citationdata.loc[len(citationdata)] = str(tags["doi"]),str(tags["title"]),authorslist,str(tags["year"]),str(tags["paperId"]),str(intentlist),str(tags["isInfluential"]),str(tags["url"]),str(tags["venue"]),str(tags["arxivId"])
     count+=1
 
-citationdata.to_excel(filename, sheet_name="Scite Data", index=False) # Write Dataframe to Excel File
+citationdata.to_excel(filename, sheet_name="Semantic Scholar", index=False) # Write Dataframe to Excel File
 print(str(count), " citation(s) written to file")
 
 exit()
